@@ -76,6 +76,8 @@ resource "aws_iam_group_membership" "t2" {
 }
 
 #Import users
+#terraform import aws_iam_user.u9 miyeon
+#terraform import aws_iam_user.u10 mina
 
 resource "aws_iam_user" "u9" {
   name = "miyeon"
