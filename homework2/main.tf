@@ -22,7 +22,7 @@ resource "aws_s3_bucket" "bucket3" {
   bucket = "kaizen-slava2"
 }
 
-#aws_s3_bucket.bucket4 kaizen-slava3
+# terraform import aws_s3_bucket.bucket4 kaizen-slava3
 resource "aws_s3_bucket" "bucket4" {
   bucket = "kaizen-slava3"
 }
