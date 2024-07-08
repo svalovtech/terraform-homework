@@ -47,6 +47,7 @@ resource "aws_instance" "web-1" {
   vpc_security_group_ids = [aws_security_group.allow_tls.id]
   user_data = file('user-data.sh')
 
+  
   tags = {
     Name = "web-3"
   }
