@@ -53,3 +53,14 @@ resource "aws_instance" "web-1" {
   }
 }
 
+# output ec1 {
+#     value = aws_instance.web-1.public_ip
+#     sensitive = true
+# }
+# output ec2 {
+#     value = aws_instance.web-2.public_ip
+#     sensitive = true
+# }
+# output ec3 {
+#     value = aws_instance.web-3.public_ip
+#     sensitive = true
