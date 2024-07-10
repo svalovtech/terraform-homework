@@ -2,8 +2,9 @@
 How to create instanse
 
 1. Clone the repository:
-            **git clone <repository_url>**
-            **cd homework4**
+
+            git clone <repository_url>    #example git clone git@github.com:worktech/terraform-work.git
+            cd homework4 
 
 2.Initialize Terraform:
 
