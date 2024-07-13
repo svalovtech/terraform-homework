@@ -16,13 +16,13 @@ data "aws_ami" "ubuntu" {
 
 resource "aws_instance" "web-ubunu" {
   ami           = data.aws_ami.ubuntu.id
-  instance_type = "t2.micro"
+  instance_type = var.ec2_ins[1].instance_type
   subnet_id = aws_subnet.pb2.id
   vpc_security_group_ids = [aws_security_group.allow_tls.id]
   user_data = file("apache-ubuntu.sh")
 
   tags = {
-    Name = "Ubuntu"
+    Name = var.ec2_ins[1].name
   }
 }
 
