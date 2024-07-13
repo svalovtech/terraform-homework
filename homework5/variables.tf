@@ -26,7 +26,7 @@ variable ec2_ins {
     name = string
     }))
 }
-variable vps_cidr {
+variable vpc_cidr {
     type = list(object({
       cidr_block = string
       dns_support = bool

@@ -3,7 +3,7 @@ provider aws {
 }
 
 resource "aws_vpc" "vpc" {
-  cidr_block = var.vpc_cidr[0]
+  cidr_block = var.vpc_cidr[0].cidr_block
   enable_dns_support = var.vpc_cidr[0].dns_support
   enable_dns_hostnames = var.vpc_cidr[0].dns_hostnames
   tags = {
@@ -14,7 +14,7 @@ resource "aws_vpc" "vpc" {
 }
 resource "aws_subnet" "pb1" {
   vpc_id     = aws_vpc.vpc.id
-  cidr_block = var.subnet[0]
+  cidr_block = var.subnet[0].cidr
   availability_zone = "${var.region}a"
   map_public_ip_on_launch = true
   tags = {
@@ -24,7 +24,7 @@ resource "aws_subnet" "pb1" {
 
 resource "aws_subnet" "pb2" {
   vpc_id     = aws_vpc.vpc.id
-  cidr_block = var.subnet[1]
+  cidr_block = var.subnet[1].cidr
   availability_zone = "${var.region}b"
   map_public_ip_on_launch = true
   tags = {
@@ -34,22 +34,22 @@ resource "aws_subnet" "pb2" {
 
 resource "aws_subnet" "pr1" {
   vpc_id     = aws_vpc.vpc.id
-  cidr_block = var.subnet[3]
+  cidr_block = var.subnet[2].cidr
   availability_zone = "${var.region}c"
   map_public_ip_on_launch = false
   tags = {
-    Name = var.subnet[3].subnet_name
+    Name = var.subnet[2].subnet_name
   }
 }
 
 
 resource "aws_subnet" "pr2" {
   vpc_id     = aws_vpc.vpc.id
-  cidr_block = var.subnet[4]
+  cidr_block = var.subnet[3].cidr
   availability_zone = "${var.region}d"
   map_public_ip_on_launch = false
   tags = {
-    Name = var.subnet[4].subnet_name
+    Name = var.subnet[3].subnet_name
   }
 }
 

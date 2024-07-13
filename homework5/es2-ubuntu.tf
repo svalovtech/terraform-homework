@@ -14,7 +14,7 @@ data "aws_ami" "ubuntu" {
   owners = ["099720109477"] # Canonical
 }
 
-resource "aws_instance" "web-ubunu" {
+resource "aws_instance" "web-ubuntu" {
   ami           = data.aws_ami.ubuntu.id
   instance_type = var.ec2_ins[1].instance_type
   subnet_id = aws_subnet.pb2.id
@@ -27,5 +27,5 @@ resource "aws_instance" "web-ubunu" {
 }
 
 output ec2-ubuntu {
-    value = aws_instance.web-ubunu.public_ip
+    value = aws_instance.web-ubuntu.public_ip
 }
