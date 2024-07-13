@@ -7,60 +7,38 @@ resource "aws_key_pair" "hm3" {
   public_key = file("~/.ssh/id_rsa.pub")
 }
 
+data "aws_ami" "linux-2" {
+ most_recent = true
+
+
+ filter {
+   name   = "owner-alias"
+   values = ["amazon"]
+ }
+
+
+ filter {
+   name   = "name"
+   values = ["amzn2-ami-hvm*"]
+ }
+}
+
 resource "aws_instance" "web-1" {
 
-  ami           = "ami-03b039a920e4e8966"
+  ami           = data.aws_ami.linux-2.id
   instance_type = "t2.micro"
-  availability_zone = "us-west-2c"
-  
+  availability_zone = element(["us-west-2a", "us-west-2b", "us-west-2c"], count.index)
+  count = 3
   key_name = aws_key_pair.hm3.key_name
   vpc_security_group_ids = [aws_security_group.allow_tls.id]
-  user_data = file('user-data.sh')
+  user_data = file("user-data.sh")
 
   tags = {
-    Name = "web-1"
+     Name = "web-${count.index + 1}"
   }
 }
 
-  resource "aws_instance" "web-2" {
-
-  ami           = "ami-03b039a920e4e8966"
-  instance_type = "t2.micro"
-  availability_zone = "us-west-2a"
-  
-  key_name = aws_key_pair.hm3.key_name
-  vpc_security_group_ids = [aws_security_group.allow_tls.id]
-  user_data = file('user-data.sh')
-
-  tags = {
-    Name = "web-2"
-  }
-  }
-
-  resource "aws_instance" "web-3" {
-
-  ami           = "ami-03b039a920e4e8966"
-  instance_type = "t2.micro"
-  availability_zone = "us-west-2b"
-  
-  key_name = aws_key_pair.hm3.key_name
-  vpc_security_group_ids = [aws_security_group.allow_tls.id]
-  user_data = file('user-data.sh')
-
-  
-  tags = {
-    Name = "web-3"
-  }
+  output ec1 {
+    value = aws_instance.web-1[*].public_ip
 }
 
-# output ec1 {
-#     value = aws_instance.web-1.public_ip
-#     sensitive = true
-# }
-# output ec2 {
-#     value = aws_instance.web-2.public_ip
-#     sensitive = true
-# }
-# output ec3 {
-#     value = aws_instance.web-3.public_ip
-#     sensitive = true
