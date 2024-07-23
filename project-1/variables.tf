@@ -2,12 +2,16 @@ variable region {
   type =string
 }
 
-
-variable allow_ports {
- type = list 
+variable rt_names {
+  type = list(string)
 }
-variable key_name {
+
+variable ing_name {
   type = string
+}
+
+variable port {
+ type = list 
 }
 
 variable subnet {
@@ -16,12 +20,12 @@ variable subnet {
     subnet_name = string
   }))
 }
-
-variable "instance_type" {
-  type = string
+variable ec2_ins {
+  type = list(object ({
+    instance_type = string 
+    name = string
+    }))
 }
-    
-
 variable vpc_cidr {
     type = list(object({
       cidr_block = string
@@ -29,4 +33,7 @@ variable vpc_cidr {
       dns_hostnames = bool
     }))
   
+}
+variable key_name {
+  type = string
 }

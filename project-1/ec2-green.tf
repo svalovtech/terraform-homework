@@ -1,4 +1,5 @@
-# data "aws_ami" "am_blue" {
+
+# data "aws_ami" "am-l1" {
 #   most_recent = true
   
 #   filter {
@@ -12,14 +13,18 @@
 # owners = ["137112412989"]
 # }
 
-# resource "aws_instance" "web" {
-#   ami           = data.aws_ami.am_blue.id
-#   instance_type = var.instance_type
+# resource "aws_instance" "web-amazon1" {
+#   ami           = data.aws_ami.am-l1.id
+#   instance_type = var.ec2_ins[1].instance_type
 #   subnet_id = aws_subnet.pb2.id
 #   vpc_security_group_ids = [aws_security_group.allow_tls.id]
 #   user_data = file("user-data.sh")
 
 #   tags = {
-#     Name = "green-group-4"
+#     Name = var.ec2_ins[1].name
 #   }
+# }
+
+# output ec2-amazon1 {
+#     value = aws_instance.web-amazon1.public_ip
 # }
