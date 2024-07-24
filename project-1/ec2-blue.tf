@@ -25,6 +25,33 @@ resource "aws_instance" "blue-ec2" {
   }
 }
 
+
+
+#///////////////////////////////// Load Balancer Target Group Blue /////////////////////////////
+
+resource "aws_lb_target_group" "blue-group" {
+  name                 = "ltg-group-4"
+  vpc_id               = aws_vpc.vpc.id
+  port                 = 80
+  protocol             = "HTTP"
+  
+   health_check {
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    timeout             = 5
+    protocol            = "HTTP"
+    interval            = 10
+    port                = 80
+  }
+  }
+#/////////////////////////////////// Load Balancer Target Group Attachment Blue /////////////////
+
+  resource "aws_lb_target_group_attachment" "blue" {
+  target_group_arn = aws_lb_target_group.blue-group.arn
+  target_id        = aws_instance.blue-ec2.id
+  port             = 80
+}
+
 output ec2-amazon {
     value = aws_instance.blue-ec2.public_ip
 }

@@ -103,57 +103,8 @@ resource "aws_lb" "web" {
   internal           = false
 }
 
-#///////////////////////////////// Load Balancer Target Group Blue /////////////////////////////
-
-resource "aws_lb_target_group" "blue-group" {
-  name                 = "ltg-group-4"
-  vpc_id               = aws_vpc.vpc.id
-  port                 = 80
-  protocol             = "HTTP"
-  
-   health_check {
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-    timeout             = 5
-    protocol            = "HTTP"
-    interval            = 10
-    port                = 80
-  }
-  }
-#/////////////////////////////////// Load Balancer Target Group Attachment Blue /////////////////
-
-  resource "aws_lb_target_group_attachment" "blue" {
-  target_group_arn = aws_lb_target_group.blue-group.arn
-  target_id        = aws_instance.blue-ec2.id
-  port             = 80
-}
 
 
-#///////////////////////////////// Load Balancer Target Group Green /////////////////////////////
-
-resource "aws_lb_target_group" "green-group" {
-  name                 = "ltg-group-4"
-  vpc_id               = aws_vpc.vpc.id
-  port                 = 80
-  protocol             = "HTTP"
-  
-  health_check {
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-    timeout             = 5
-    protocol            = "HTTP"
-    interval            = 10
-    port                = 80
-  }
-}
-
-#/////////////////////////////////// Load Balancer Target Group Attachment Green /////////////////
-
-resource "aws_lb_target_group_attachment" "green" {
-  target_group_arn = aws_lb_target_group.green-group.arn
-  target_id        = aws_instance.green-ec2.id
-  port             = 80
-}
 
 
 #/////////////////////////////////// Load Balancer Listener /////////////////////////////////////
@@ -163,11 +114,30 @@ resource "aws_lb_listener" "http" {
   port              = "80"
   protocol          = "HTTP"
 
-  default_action {
+ 
+default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.blue-group.arn
+      forward {
+        target_group {
+          arn    = aws_lb_target_group.blue-group.arn
+          weight = lookup(local.traffic_dist_map[var.traffic_distribution], "blue", 100)
+        }
+
+        target_group {
+          arn    = aws_lb_target_group.green-group.arn
+          weight = lookup(local.traffic_dist_map[var.traffic_distribution], "green", 0)
+        }
+
+        stickiness {
+          enabled  = false
+          duration = 1
+        }
+      }
+	  
   }
 }
+
+
 #///////////////////////////////////// Ouputs /////////////////////////////////////////////////
 output "web_loadbalancer_url" {
   value = aws_lb.web.dns_name
