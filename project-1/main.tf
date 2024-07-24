@@ -1,6 +1,7 @@
 provider aws {
  region = var.region 
 }
+#///////////////////////////////////// Create Public Key ///////////////
 
 resource "aws_key_pair" "bastion" {
   key_name   = var.key_name
