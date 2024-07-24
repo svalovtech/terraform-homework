@@ -43,8 +43,6 @@ variable "traffic_distribution" {
   type        = string
 }
 
-
-
 locals {
   traffic_dist_map = {
     blue = {

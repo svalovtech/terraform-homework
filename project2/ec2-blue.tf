@@ -1,7 +1,7 @@
 
 data "aws_ami" "blue" {
   most_recent = true
-   
+  
   filter {
     name   = "name"
     values = ["al2023-ami-2023*-kernel-6.1-x86_64"]
@@ -14,12 +14,11 @@ owners = ["137112412989"]
 }
 
 resource "aws_instance" "blue-ec2" {
-  ami                    = data.aws_ami.blue.id
-  instance_type          = var.ec2_ins[0].instance_type
-  subnet_id              = aws_subnet.pb1.id
+  ami           = data.aws_ami.blue.id
+  instance_type = var.ec2_ins[0].instance_type
+  subnet_id = aws_subnet.pb1.id
   vpc_security_group_ids = [aws_security_group.allow_tls.id]
-  user_data_replace_on_change = true
-  user_data = file("user-data-blue.sh")
+  user_data = file("user-data.sh")
 
   tags = {
     Name = var.ec2_ins[0].name
@@ -31,7 +30,7 @@ resource "aws_instance" "blue-ec2" {
 #///////////////////////////////// Load Balancer Target Group Blue /////////////////////////////
 
 resource "aws_lb_target_group" "blue-group" {
-  name                 = "blue-target-group"
+  name                 = "ltg-group-4"
   vpc_id               = aws_vpc.vpc.id
   port                 = 80
   protocol             = "HTTP"
@@ -53,6 +52,6 @@ resource "aws_lb_target_group" "blue-group" {
   port             = 80
 }
 
-output ec2-blue {
-    value = aws_instance.blue-ec2.id
+output ec2-amazon {
+    value = aws_instance.blue-ec2.public_ip
 }

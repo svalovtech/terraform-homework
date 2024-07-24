@@ -18,8 +18,7 @@ resource "aws_instance" "green-ec2" {
   instance_type = var.ec2_ins[1].instance_type
   subnet_id = aws_subnet.pb2.id
   vpc_security_group_ids = [aws_security_group.allow_tls.id]
-  user_data_replace_on_change = true
-  user_data = file("user-data-green.sh")
+  user_data = file("user-data.sh")
 
   tags = {
     Name = var.ec2_ins[1].name
@@ -29,7 +28,7 @@ resource "aws_instance" "green-ec2" {
 #///////////////////////////////// Load Balancer Target Group Green /////////////////////////////
 
 resource "aws_lb_target_group" "green-group" {
-  name                 = "green-target-group"
+  name                 = "ltg-group-4"
   vpc_id               = aws_vpc.vpc.id
   port                 = 80
   protocol             = "HTTP"
@@ -53,6 +52,6 @@ resource "aws_lb_target_group_attachment" "green" {
 }
 
 
-output ec2-green {
-    value = aws_instance.green-ec2.id
+output ec2-amazon1 {
+    value = aws_instance.green-ec2.public_ip
 }
