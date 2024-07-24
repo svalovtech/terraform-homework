@@ -1,5 +1,5 @@
 
-data "aws_ami" "am-l" {
+data "aws_ami" "blue" {
   most_recent = true
   
   filter {
@@ -13,8 +13,8 @@ data "aws_ami" "am-l" {
 owners = ["137112412989"]
 }
 
-resource "aws_instance" "web-amazon" {
-  ami           = data.aws_ami.am-l.id
+resource "aws_instance" "blue-ec2" {
+  ami           = data.aws_ami.blue.id
   instance_type = var.ec2_ins[0].instance_type
   subnet_id = aws_subnet.pb1.id
   vpc_security_group_ids = [aws_security_group.allow_tls.id]
@@ -26,5 +26,5 @@ resource "aws_instance" "web-amazon" {
 }
 
 output ec2-amazon {
-    value = aws_instance.web-amazon.public_ip
+    value = aws_instance.blue-ec2.public_ip
 }

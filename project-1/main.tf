@@ -92,50 +92,61 @@ resource "aws_route_table_association" "pb3_a" {
   route_table_id = aws_route_table.pb_rt.id
 }
 
-#//////////////////////////////////Launch Template////////////////
-
-resource "aws_launch_template" "b-g-d" {
-  name = "l_t-b-g-d"
-  image_id = data.aws_ami.am-l.id
-  instance_type = var.ec2_ins[0].instance_type
-  vpc_security_group_ids = [aws_security_group.allow_tls.id]
-  user_data = filebase64("${path.module}/user-data.sh")
-}
-
-#///////////////////////////////////Autoscaling Group//////////////////
-
-resource "aws_autoscaling_group" "asg_b-g-d" {
-  name                = "asg_g4-${aws_launch_template.b-g-d.latest_version}"
-  min_size            = 2
-  max_size            = 2
-  min_elb_capacity    = 2
-  health_check_type   = "ELB"
-  vpc_zone_identifier = [aws_subnet.pb1.id ,aws_subnet.pb2.id ,aws_subnet.pb3.id]
-  target_group_arns   = [aws_lb_target_group.web.arn]
-
-  launch_template {
-    id      = aws_launch_template.b-g-d.id
-    version = aws_launch_template.b-g-d.latest_version
-  }
-    lifecycle {
-    create_before_destroy = true
-  }
-}
 #/////////////////////////////////Load Balancer and Target Groups////////////////////////////
 resource "aws_lb" "web" {
   name               = "lb-group-4"
   load_balancer_type = "application"
   security_groups    = [aws_security_group.allow_tls.id]
   subnets            = [aws_subnet.pb1.id ,aws_subnet.pb2.id ,aws_subnet.pb3.id]
+  internal           = false
 }
 
-resource "aws_lb_target_group" "web" {
+resource "aws_lb_target_group" "blue-group" {
   name                 = "ltg-group-4"
   vpc_id               = aws_vpc.vpc.id
   port                 = 80
   protocol             = "HTTP"
-  deregistration_delay = 10 # seconds
+  
+   health_check {
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    timeout             = 5
+    protocol            = "HTTP"
+    interval            = 10
+    port                = 80
+  }
+  }
+
+  resource "aws_lb_target_group_attachment" "blue" {
+  target_group_arn = aws_lb_target_group.blue-group.arn
+  target_id        = aws_instance.blue-ec2.id
+  port             = 80
 }
+  
+
+resource "aws_lb_target_group" "green-group" {
+  name                 = "ltg-group-4"
+  vpc_id               = aws_vpc.vpc.id
+  port                 = 80
+  protocol             = "HTTP"
+  
+  health_check {
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    timeout             = 5
+    protocol            = "HTTP"
+    interval            = 10
+    port                = 80
+  }
+
+}
+resource "aws_lb_target_group_attachment" "green" {
+  target_group_arn = aws_lb_target_group.green-group.arn
+  target_id        = aws_instance.green-ec2.id
+  port             = 80
+}
+
+
 
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.web.arn
@@ -144,7 +155,7 @@ resource "aws_lb_listener" "http" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.web.arn
+    target_group_arn = aws_lb_target_group.blue-group.arn
   }
 }
 
