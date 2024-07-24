@@ -92,7 +92,8 @@ resource "aws_route_table_association" "pb3_a" {
   route_table_id = aws_route_table.pb_rt.id
 }
 
-#/////////////////////////////////Load Balancer and Target Groups////////////////////////////
+#///////////////////////////////// Load Balancer //////////////////////////////////////////
+
 resource "aws_lb" "web" {
   name               = "lb-group-4"
   load_balancer_type = "application"
@@ -100,6 +101,8 @@ resource "aws_lb" "web" {
   subnets            = [aws_subnet.pb1.id ,aws_subnet.pb2.id ,aws_subnet.pb3.id]
   internal           = false
 }
+
+#///////////////////////////////// Load Balancer Target Group Blue /////////////////////////////
 
 resource "aws_lb_target_group" "blue-group" {
   name                 = "ltg-group-4"
@@ -116,13 +119,16 @@ resource "aws_lb_target_group" "blue-group" {
     port                = 80
   }
   }
+#/////////////////////////////////// Load Balancer Target Group Attachment Blue /////////////////
 
   resource "aws_lb_target_group_attachment" "blue" {
   target_group_arn = aws_lb_target_group.blue-group.arn
   target_id        = aws_instance.blue-ec2.id
   port             = 80
 }
-  
+
+
+#///////////////////////////////// Load Balancer Target Group Green /////////////////////////////
 
 resource "aws_lb_target_group" "green-group" {
   name                 = "ltg-group-4"
@@ -138,8 +144,10 @@ resource "aws_lb_target_group" "green-group" {
     interval            = 10
     port                = 80
   }
-
 }
+
+#/////////////////////////////////// Load Balancer Target Group Attachment Green /////////////////
+
 resource "aws_lb_target_group_attachment" "green" {
   target_group_arn = aws_lb_target_group.green-group.arn
   target_id        = aws_instance.green-ec2.id
@@ -147,6 +155,7 @@ resource "aws_lb_target_group_attachment" "green" {
 }
 
 
+#/////////////////////////////////// Load Balancer Listener /////////////////////////////////////
 
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.web.arn
@@ -158,7 +167,7 @@ resource "aws_lb_listener" "http" {
     target_group_arn = aws_lb_target_group.blue-group.arn
   }
 }
-
+#///////////////////////////////////// Ouputs /////////////////////////////////////////////////
 output "web_loadbalancer_url" {
   value = aws_lb.web.dns_name
 }
