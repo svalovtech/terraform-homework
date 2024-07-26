@@ -58,3 +58,4 @@ resource "aws_lb_target_group_attachment" "green" {
 output ec2-green {
     value = aws_instance.green-ec2[*].id
 }
+

@@ -59,3 +59,4 @@ resource "aws_lb_target_group" "blue-group" {
 output ec2-blue {
     value = aws_instance.blue-ec2[*].id
 }
+

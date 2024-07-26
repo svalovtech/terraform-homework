@@ -87,5 +87,7 @@ locals {
   }
 }
 
+
+
 #///// terraform apply -var 'traffic_distribution=green'
 #///// for i in `seq 1 10`; do curl <Your url lb output>; done
