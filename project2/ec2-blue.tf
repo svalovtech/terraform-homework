@@ -1,7 +1,7 @@
 
 data "aws_ami" "blue" {
   most_recent = true
-  
+   
   filter {
     name   = "name"
     values = ["al2023-ami-2023*-kernel-6.1-x86_64"]
@@ -14,14 +14,17 @@ owners = ["137112412989"]
 }
 
 resource "aws_instance" "blue-ec2" {
-  ami           = data.aws_ami.blue.id
-  instance_type = var.ec2_ins[0].instance_type
-  subnet_id = aws_subnet.pb1.id
+  count = var.enable_blue_env ? var.blue_instance_count : 0
+  ami                    = data.aws_ami.blue.id
+  instance_type          = var.instance_type
+  subnet_id              = aws_subnet.pb1.id
   vpc_security_group_ids = [aws_security_group.allow_tls.id]
-  user_data = file("user-data.sh")
+  user_data_replace_on_change = true
+  user_data = file("user-data-blue.sh")
+  
 
   tags = {
-    Name = var.ec2_ins[0].name
+    Name = "blue-group-4-${count.index}"
   }
 }
 
@@ -30,7 +33,7 @@ resource "aws_instance" "blue-ec2" {
 #///////////////////////////////// Load Balancer Target Group Blue /////////////////////////////
 
 resource "aws_lb_target_group" "blue-group" {
-  name                 = "ltg-group-4"
+  name                 = "blue-target-group"
   vpc_id               = aws_vpc.vpc.id
   port                 = 80
   protocol             = "HTTP"
@@ -47,11 +50,12 @@ resource "aws_lb_target_group" "blue-group" {
 #/////////////////////////////////// Load Balancer Target Group Attachment Blue /////////////////
 
   resource "aws_lb_target_group_attachment" "blue" {
+  count            = length(aws_instance.blue-ec2)
   target_group_arn = aws_lb_target_group.blue-group.arn
-  target_id        = aws_instance.blue-ec2.id
+  target_id        = aws_instance.blue-ec2[count.index].id
   port             = 80
 }
 
-output ec2-amazon {
-    value = aws_instance.blue-ec2.public_ip
+output ec2-blue {
+    value = aws_instance.blue-ec2[*].id
 }

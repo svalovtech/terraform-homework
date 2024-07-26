@@ -14,21 +14,23 @@ owners = ["137112412989"]
 }
 
 resource "aws_instance" "green-ec2" {
+    count = var.enable_blue_env ? var.blue_instance_count : 0
   ami           = data.aws_ami.green.id
-  instance_type = var.ec2_ins[1].instance_type
+  instance_type = var.instance_type
   subnet_id = aws_subnet.pb2.id
   vpc_security_group_ids = [aws_security_group.allow_tls.id]
-  user_data = file("user-data.sh")
+  user_data_replace_on_change = true
+  user_data = file("user-data-green.sh")
 
   tags = {
-    Name = var.ec2_ins[1].name
+    Name = "green-group-4-${count.index}"
   }
 }
 
 #///////////////////////////////// Load Balancer Target Group Green /////////////////////////////
 
 resource "aws_lb_target_group" "green-group" {
-  name                 = "ltg-group-4"
+  name                 = "green-target-group"
   vpc_id               = aws_vpc.vpc.id
   port                 = 80
   protocol             = "HTTP"
@@ -46,12 +48,13 @@ resource "aws_lb_target_group" "green-group" {
 #/////////////////////////////////// Load Balancer Target Group Attachment Green /////////////////
 
 resource "aws_lb_target_group_attachment" "green" {
+  count            = length(aws_instance.green-ec2)
   target_group_arn = aws_lb_target_group.green-group.arn
-  target_id        = aws_instance.green-ec2.id
+  target_id        = aws_instance.green-ec2[count.index].id
   port             = 80
 }
 
 
-output ec2-amazon1 {
-    value = aws_instance.green-ec2.public_ip
+output ec2-green {
+    value = aws_instance.green-ec2[*].id
 }

@@ -20,12 +20,10 @@ variable subnet {
     subnet_name = string
   }))
 }
-variable ec2_ins {
-  type = list(object ({
-    instance_type = string 
-    name = string
-    }))
+variable instance_type {
+  type =string
 }
+
 variable vpc_cidr {
     type = list(object({
       cidr_block = string
@@ -42,6 +40,27 @@ variable "traffic_distribution" {
   description = "Levels of traffic distribution"
   type        = string
 }
+
+variable "enable_blue_env" {
+  description = "Enable green environment"
+  type        = bool
+}
+
+variable "blue_instance_count" {
+  description = "Number of instances in green environment"
+  type        = number
+}
+
+variable "enable_green_env" {
+  description = "Enable green environment"
+  type        = bool
+}
+
+variable "green_instance_count" {
+  description = "Number of instances in green environment"
+  type        = number
+}
+
 
 locals {
   traffic_dist_map = {
@@ -67,3 +86,6 @@ locals {
     }
   }
 }
+
+#///// terraform apply -var 'traffic_distribution=green'
+#///// for i in `seq 1 10`; do curl <Your url lb output>; done
